@@ -1,47 +1,53 @@
+import java.io.BufferedOutputStream;
+import java.io.DataOutputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.util.Random;
 
 public class Quicksort {
-
-	public static void main(String[] args) {
+	public static void main(String[] args) throws IOException {
 		if (args.length != 3) {
-			System.out.println(" Data file name, number of buffer, stat- file nme");
+			System.out.println(
+					"Error: Please provide the data file name, number of buffers, and stat file as arguments.");
+			return;
 		}
-		return;
+
+		// get the arguments from the command line
+		String dataFile = args[0];
+		int numOfBuffers = Integer.parseInt(args[1]);
+		String statFile = args[2];
+
+		// start recording time to perform quick sort
+		long startTime = System.currentTimeMillis();
+		QSort qsort = new QSort(dataFile, numOfBuffers);
+		qsort.readBlock();
+		qsort.quicksort();
+		qsort.flush();
+		long endTime = System.currentTimeMillis(); // end timer
+
+		// append stats data to a text file
+		Bufferpool.Stats.stats(dataFile, "statistics.txt", startTime, endTime);
 	}
 
-	int partition(Comparable[] A, int left, int right, Comparable pivot) {
-		while (left <= right) { // Move bounds inward until they meet
-			while (A[left].compareTo(pivot) < 0)
-				left++;
-			while ((right >= left) && (A[right].compareTo(pivot) >= 0))
-				right--;
-			if (right > left)
-				swap(A, left, right); // Swap out-of-place values
+	public void generateFile() throws IOException {
+		// short val_;
+		Random random = new Random();
+		DataOutputStream file = new DataOutputStream(
+				new BufferedOutputStream(new FileOutputStream("sample_input10a.dat")));
+		// for (int i = 0; i < 10; i++) {
+		int val = (short) (random.nextInt(2999) + 1);
+		file.writeShort(val);
+		int j = 0;
+		// int j = i % 2;
+		if (j % 2 == 1) {
+			val = (short) 8224;
+		} else {
+			val = (short) (random.nextInt(26) + 0) * 2041;
 		}
-		return left; // Return first position in right partition
-	}
+		file.writeShort(val);
 
-	int findpivot(Comparable[] A, int i, int j) {
-		return (i + j) / 2;
-	}
-
-	void quicksort(Comparable[] A, int i, int j) { // Quicksort
-		int pivotindex = findpivot(A, i, j); // Pick a pivot
-		swap(A, pivotindex, j); // Stick pivot at end
-		// k will be the first position in the right subarray
-		int k = partition(A, i, j - 1, A[j]);
-		swap(A, k, j); // Put pivot in place
-		if ((k - i) > 1)
-			quicksort(A, i, k - 1); // Sort left partition
-		if ((j - k) > 1)
-			quicksort(A, k + 1, j); // Sort right partition
-	}
-
-	private void swap(Comparable[] a, int i, int j) {
-		// TODO Auto-generated method stub
-		Comparable swap = a[i];
-		a[i] = a[j];
-		a[j] = swap;
+		file.flush();
+		file.close();
 
 	}
-
 }
